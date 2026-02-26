@@ -1,0 +1,55 @@
+<Window x:Class="MarkForge.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:MarkForge.App.ViewModels"
+        xmlns:views="clr-namespace:MarkForge.App.Views"
+        Title="MarkForge"
+        Icon="Assets/MarkForge.ico"
+        Width="1200"
+        Height="760"
+        MinWidth="980"
+        MinHeight="640"
+        d:DataContext="{d:DesignInstance vm:MainViewModel}"
+        mc:Ignorable="d">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:ConvertViewModel}">
+            <views:ConvertView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="230" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                BorderThickness="0,0,1,0"
+                BorderBrush="#D6D8DF"
+                Background="#F4F5F8">
+            <StackPanel Margin="16">
+                <TextBlock FontSize="26" FontWeight="SemiBold" Text="MarkForge" />
+                <TextBlock Margin="0,4,0,24" Foreground="#56606D" Text="Phase 0 Foundation" />
+
+                <Button Height="36"
+                        Margin="0,0,0,10"
+                        Command="{Binding ShowConvertViewCommand}"
+                        Content="Convert" />
+                <Button Height="36" Command="{Binding ShowSettingsViewCommand}" Content="Settings" />
+
+                <Border Margin="0,24,0,0" Padding="10" Background="#E8EDF5" CornerRadius="6">
+                    <TextBlock Foreground="#2F3E55" TextWrapping="Wrap">
+                        Use this shell to validate file selection, placeholder runs, and settings save/load.
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" />
+    </Grid>
+</Window>
