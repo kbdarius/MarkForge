@@ -10,6 +10,10 @@ public sealed class AppSettings
 
     public string? LuaFiltersDirectoryPath { get; set; }
 
+    public bool EnableOnlineMermaidRendering { get; set; } = true;
+
+    public string TableStyleProfile { get; set; } = "template-default";
+
     public bool IncludeTableOfContents { get; set; } = true;
 
     public bool UseLandscapeOrientation { get; set; }
