@@ -12,9 +12,13 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\MarkForge.ico" />
+    <Content Include="ConverterAssets\filters\*.lua">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

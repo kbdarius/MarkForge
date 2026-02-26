@@ -8,6 +8,8 @@ public sealed class ConversionRequest
 
     public string? ReferenceTemplatePath { get; init; }
 
+    public string? LuaFiltersDirectoryPath { get; init; }
+
     public bool IncludeTableOfContents { get; init; }
 
     public bool UseLandscapeOrientation { get; init; }

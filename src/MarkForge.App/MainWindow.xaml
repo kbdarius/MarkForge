@@ -34,7 +34,7 @@
                 Background="#F4F5F8">
             <StackPanel Margin="16">
                 <TextBlock FontSize="26" FontWeight="SemiBold" Text="MarkForge" />
-                <TextBlock Margin="0,4,0,24" Foreground="#56606D" Text="Phase 0 Foundation" />
+                <TextBlock Margin="0,4,0,24" Foreground="#56606D" Text="Phase 1 Single-File MVP" />
 
                 <Button Height="36"
                         Margin="0,0,0,10"
@@ -44,7 +44,7 @@
 
                 <Border Margin="0,24,0,0" Padding="10" Background="#E8EDF5" CornerRadius="6">
                     <TextBlock Foreground="#2F3E55" TextWrapping="Wrap">
-                        Use this shell to validate file selection, placeholder runs, and settings save/load.
+                        Use this panel to run real markdown to DOCX conversion with Pandoc options.
                     </TextBlock>
                 </Border>
             </StackPanel>

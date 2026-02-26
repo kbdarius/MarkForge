@@ -59,3 +59,45 @@ This file tracks implementation progress by session so work can resume quickly a
 
 - Current branch target: `main`
 - Next planned phase: `Phase 1 - Single-File Conversion MVP`
+
+## 2026-02-26 - Session 3
+
+- Phase: `Phase 1 - Single-File Conversion MVP`
+- Status: `Ready for Approval`
+
+### Completed
+
+- Replaced placeholder pipeline with real Pandoc conversion service:
+  - `src/MarkForge.App/Services/PandocConversionService.cs`
+- Added detailed run logs under `%LOCALAPPDATA%\MarkForge\logs` including:
+  - command line
+  - selected options
+  - stdout/stderr
+  - error/exception details
+- Added real DOCX orientation post-processing via Open XML SDK:
+  - `src/MarkForge.App/Services/OpenXmlDocxOrientationService.cs`
+- Added Lua filter support:
+  - optional user-selected Lua filter folder in UI/settings
+  - bundled default filters copied to output (`ConverterAssets/filters/*.lua`)
+- Updated conversion UI for Phase 1:
+  - run button now executes real conversion
+  - added Lua filter folder picker
+  - added last output DOCX path + last detailed log path fields
+- Updated settings model and summary for Lua filters and new defaults.
+- Verified build:
+  - `dotnet build MarkForge.sln` -> 0 errors, 0 warnings
+- Verified app startup:
+  - executable launch sanity check (`LAUNCHED_OK`)
+- Verified end-to-end conversion via temporary harness:
+  - generated DOCX successfully (`DOCX_OK`)
+  - generated detailed run log successfully (`LOG_OK`)
+
+### Pending Before Phase 1 Gate
+
+- User demo/approval on real markdown sample before starting Phase 2.
+
+### Resume Notes
+
+- Use the `Convert` panel to run a real `.md` -> `.docx` conversion.
+- Detailed run logs are written to `%LOCALAPPDATA%\MarkForge\logs`.
+- Next planned phase after approval: `Phase 2 - Fidelity Improvements (Tables + Diagrams)`.

@@ -4,7 +4,7 @@ namespace MarkForge.App.Services;
 
 public interface IConversionService
 {
-    Task RunAsync(
+    Task<ConversionResult> RunAsync(
         ConversionRequest request,
         IProgress<string> progress,
         CancellationToken cancellationToken = default);

@@ -8,11 +8,13 @@ public sealed class AppSettings
 
     public string? LastTemplatePath { get; set; }
 
+    public string? LuaFiltersDirectoryPath { get; set; }
+
     public bool IncludeTableOfContents { get; set; } = true;
 
     public bool UseLandscapeOrientation { get; set; }
 
-    public string HighlightStyle { get; set; } = "yellow";
+    public string HighlightStyle { get; set; } = "pygments";
 
     public DateTimeOffset? LastSavedUtc { get; set; }
 }

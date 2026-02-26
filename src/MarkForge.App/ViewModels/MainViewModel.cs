@@ -10,7 +10,8 @@ public partial class MainViewModel : ObservableObject
     {
         ISettingsService settingsService = new JsonSettingsService();
         IFileDialogService fileDialogService = new FileDialogService();
-        IConversionService conversionService = new PlaceholderConversionService();
+        IDocxOrientationService docxOrientationService = new OpenXmlDocxOrientationService();
+        IConversionService conversionService = new PandocConversionService(docxOrientationService);
 
         ConvertViewModel = new ConvertViewModel(
             settingsService,

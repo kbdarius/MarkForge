@@ -61,7 +61,7 @@ public sealed class JsonSettingsService : ISettingsService
     private static AppSettings Normalize(AppSettings settings)
     {
         settings.HighlightStyle = string.IsNullOrWhiteSpace(settings.HighlightStyle)
-            ? "yellow"
+            ? "pygments"
             : settings.HighlightStyle;
         return settings;
     }

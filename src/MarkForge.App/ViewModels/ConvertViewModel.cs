@@ -28,9 +28,10 @@ public partial class ConvertViewModel : ObservableObject
 
     public IReadOnlyList<string> HighlightStyles { get; } = new[]
     {
-        "yellow",
-        "green",
-        "blue",
+        "pygments",
+        "tango",
+        "kate",
+        "monochrome",
         "none"
     };
 
@@ -48,19 +49,28 @@ public partial class ConvertViewModel : ObservableObject
     private string referenceTemplatePath = string.Empty;
 
     [ObservableProperty]
+    private string luaFiltersDirectoryPath = string.Empty;
+
+    [ObservableProperty]
     private bool includeTableOfContents = true;
 
     [ObservableProperty]
     private bool useLandscapeOrientation;
 
     [ObservableProperty]
-    private string highlightStyle = "yellow";
+    private string highlightStyle = "pygments";
 
     [ObservableProperty]
     private string statusMessage;
 
     [ObservableProperty]
     private bool isBusy;
+
+    [ObservableProperty]
+    private string lastOutputDocxPath = string.Empty;
+
+    [ObservableProperty]
+    private string lastDetailedLogPath = string.Empty;
 
     [RelayCommand]
     private void BrowseInputFile()
@@ -93,6 +103,16 @@ public partial class ConvertViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void BrowseLuaFiltersFolder()
+    {
+        var selected = _fileDialogService.PickFolder(LuaFiltersDirectoryPath);
+        if (!string.IsNullOrWhiteSpace(selected))
+        {
+            LuaFiltersDirectoryPath = selected;
+        }
+    }
+
+    [RelayCommand]
     private async Task LoadSettings()
     {
         var settings = await _settingsService.LoadAsync();
@@ -109,6 +129,7 @@ public partial class ConvertViewModel : ObservableObject
             LastInputFilePath = InputFilePath,
             LastOutputFolderPath = OutputFolderPath,
             LastTemplatePath = ReferenceTemplatePath,
+            LuaFiltersDirectoryPath = LuaFiltersDirectoryPath,
             IncludeTableOfContents = IncludeTableOfContents,
             UseLandscapeOrientation = UseLandscapeOrientation,
             HighlightStyle = HighlightStyle
@@ -119,11 +140,13 @@ public partial class ConvertViewModel : ObservableObject
         AppendLog($"Settings saved to {SettingsFilePath}");
     }
 
-    [RelayCommand(CanExecute = nameof(CanRunPlaceholderConversion))]
-    private async Task RunPlaceholderConversion()
+    [RelayCommand(CanExecute = nameof(CanRunConversion))]
+    private async Task RunConversion()
     {
         IsBusy = true;
-        StatusMessage = "Running placeholder conversion...";
+        LastOutputDocxPath = string.Empty;
+        LastDetailedLogPath = string.Empty;
+        StatusMessage = "Running conversion...";
         AppendLog("-----");
         AppendLog("Starting conversion run.");
 
@@ -131,9 +154,8 @@ public partial class ConvertViewModel : ObservableObject
         {
             InputFilePath = InputFilePath,
             OutputFolderPath = OutputFolderPath,
-            ReferenceTemplatePath = string.IsNullOrWhiteSpace(ReferenceTemplatePath)
-                ? null
-                : ReferenceTemplatePath,
+            ReferenceTemplatePath = NormalizeNullablePath(ReferenceTemplatePath),
+            LuaFiltersDirectoryPath = NormalizeNullablePath(LuaFiltersDirectoryPath),
             IncludeTableOfContents = IncludeTableOfContents,
             UseLandscapeOrientation = UseLandscapeOrientation,
             HighlightStyle = HighlightStyle
@@ -142,13 +164,27 @@ public partial class ConvertViewModel : ObservableObject
         try
         {
             var progress = new Progress<string>(AppendLog);
-            await _conversionService.RunAsync(request, progress);
-            StatusMessage = "Placeholder conversion completed.";
+            var result = await _conversionService.RunAsync(request, progress);
+            LastOutputDocxPath = result.OutputDocxPath;
+            LastDetailedLogPath = result.DetailedLogPath;
+            StatusMessage = "Conversion completed.";
+            AppendLog($"Output DOCX: {result.OutputDocxPath}");
+            AppendLog($"Detailed log: {result.DetailedLogPath}");
             AppendLog("Run complete.");
+        }
+        catch (ConversionRunException ex)
+        {
+            LastDetailedLogPath = ex.DetailedLogPath ?? string.Empty;
+            StatusMessage = "Conversion failed.";
+            AppendLog($"ERROR: {ex.Message}");
+            if (!string.IsNullOrWhiteSpace(ex.DetailedLogPath))
+            {
+                AppendLog($"Detailed log: {ex.DetailedLogPath}");
+            }
         }
         catch (Exception ex)
         {
-            StatusMessage = "Placeholder conversion failed.";
+            StatusMessage = "Conversion failed.";
             AppendLog($"ERROR: {ex.Message}");
         }
         finally
@@ -157,7 +193,7 @@ public partial class ConvertViewModel : ObservableObject
         }
     }
 
-    private bool CanRunPlaceholderConversion()
+    private bool CanRunConversion()
     {
         return !IsBusy
                && !string.IsNullOrWhiteSpace(InputFilePath)
@@ -175,7 +211,7 @@ public partial class ConvertViewModel : ObservableObject
             AppendLog($"Output folder defaulted to input directory: {inputDirectory}");
         }
 
-        RunPlaceholderConversionCommand.NotifyCanExecuteChanged();
+        RunConversionCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnOutputFolderPathChanged(string value)
@@ -186,12 +222,12 @@ public partial class ConvertViewModel : ObservableObject
             && !string.IsNullOrWhiteSpace(inputDirectory)
             && !string.Equals(value, inputDirectory, StringComparison.OrdinalIgnoreCase);
 
-        RunPlaceholderConversionCommand.NotifyCanExecuteChanged();
+        RunConversionCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnIsBusyChanged(bool value)
     {
-        RunPlaceholderConversionCommand.NotifyCanExecuteChanged();
+        RunConversionCommand.NotifyCanExecuteChanged();
     }
 
     private void ApplySettings(AppSettings settings)
@@ -199,10 +235,11 @@ public partial class ConvertViewModel : ObservableObject
         InputFilePath = settings.LastInputFilePath ?? string.Empty;
         OutputFolderPath = settings.LastOutputFolderPath ?? string.Empty;
         ReferenceTemplatePath = settings.LastTemplatePath ?? string.Empty;
+        LuaFiltersDirectoryPath = settings.LuaFiltersDirectoryPath ?? string.Empty;
         IncludeTableOfContents = settings.IncludeTableOfContents;
         UseLandscapeOrientation = settings.UseLandscapeOrientation;
         HighlightStyle = string.IsNullOrWhiteSpace(settings.HighlightStyle)
-            ? "yellow"
+            ? "pygments"
             : settings.HighlightStyle;
     }
 
@@ -220,5 +257,10 @@ public partial class ConvertViewModel : ObservableObject
 
         var directory = Path.GetDirectoryName(path);
         return string.IsNullOrWhiteSpace(directory) ? null : directory;
+    }
+
+    private static string? NormalizeNullablePath(string? path)
+    {
+        return string.IsNullOrWhiteSpace(path) ? null : path;
     }
 }

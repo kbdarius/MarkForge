@@ -29,6 +29,7 @@ public partial class SettingsViewModel : ObservableObject
             $"Last Input File: {settings.LastInputFilePath ?? "(not set)"}{Environment.NewLine}" +
             $"Last Output Folder: {settings.LastOutputFolderPath ?? "(not set)"}{Environment.NewLine}" +
             $"Last Template File: {settings.LastTemplatePath ?? "(not set)"}{Environment.NewLine}" +
+            $"Lua Filters Folder: {settings.LuaFiltersDirectoryPath ?? "(not set)"}{Environment.NewLine}" +
             $"Include TOC: {settings.IncludeTableOfContents}{Environment.NewLine}" +
             $"Landscape: {settings.UseLandscapeOrientation}{Environment.NewLine}" +
             $"Highlight Style: {settings.HighlightStyle}{Environment.NewLine}" +
